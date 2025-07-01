@@ -1,22 +1,27 @@
 import osUtils from "os-utils";
 import fs from "fs";
 import os from "os";
+import { BrowserWindow } from "electron";
 
 const POLLING_INTERVAL = 500; // mili seconds
 
-export function pollResources() {
+export function pollResources(mainWindow: BrowserWindow) {
   setInterval(async () => {
     const cpuUsage = await getCpuUsage();
     const ramUsage = getRamUsage();
     const storageData = getStorageData();
-    console.log({ cpuUsage, ramUsage, storageUsage: storageData.usage });
+    mainWindow.webContents.send("statistics", {
+      cpuUsage,
+      ramUsage,
+      storageUsage: storageData.usage,
+    });
   }, POLLING_INTERVAL);
 }
 
 export function getStaticData() {
   const totalStorage = getStorageData().total;
   const cpuModel = os.cpus()[0].model;
-  const totalMemoryGB = Math.floor(osUtils.totalmem()) / 1024; // totalmem is stored in MB, so we divide by 1024.. to convert them into GB
+  const totalMemoryGB = Math.floor(osUtils.totalmem() / 1024); // totalmem is stored in MB, so we divide by 1024.. to convert them into GB
 
   return { totalStorage, cpuModel, totalMemoryGB };
 } // this is the data that won't change by time, so we don't need to update it every time, it is just static as mentioned in the function name.
