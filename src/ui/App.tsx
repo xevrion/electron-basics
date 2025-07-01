@@ -6,6 +6,10 @@ import './App.css'
 function App() {
   const [count, setCount] = useState(0)
 
+  // this will ignore the typescript
+  // @ts-ignore
+  window.electron.getStaticData();
+
   return (
     <>
       <div>
